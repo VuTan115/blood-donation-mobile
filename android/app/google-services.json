@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "515065352774",
+    "firebase_url": "https://personal-financel-app-default-rtdb.firebaseio.com",
+    "project_id": "personal-financel-app",
+    "storage_bucket": "personal-financel-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:515065352774:android:311546f23979fd77f97047",
+        "android_client_info": {
+          "package_name": "com.example.personal_financial_management"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "515065352774-7domr5n0f31jn1et7c75oqnrds1kc2ih.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.personal_financial_management",
+            "certificate_hash": "3e0c8c95e1b6d9175c6ed673a4ec77416fddd0b1"
+          }
+        },
+        {
+          "client_id": "515065352774-b6hmuepptkp59r8bchj2oa9ptghbfsa2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIGVsY2hn2MICXSbcPUsKmVUPa4VfC4Ns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "515065352774-b6hmuepptkp59r8bchj2oa9ptghbfsa2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
