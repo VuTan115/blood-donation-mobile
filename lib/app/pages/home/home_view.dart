@@ -1,21 +1,19 @@
-import 'package:dio/dio.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutterfire_ui/auth.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:personal_financial_management/app/components/charts/chart_indicator/pie_chart.dart';
 import 'package:personal_financial_management/app/components/colors/my_colors.dart';
 import 'package:personal_financial_management/app/components/date_picker/date_controller.dart';
-import 'package:personal_financial_management/app/components/icons/my_icons.dart';
-import 'package:personal_financial_management/app/pages/detail/detail_view.dart';
-import 'package:personal_financial_management/app/routes/app_routes.dart';
 import 'package:personal_financial_management/app/utils/utils.dart';
 import 'package:personal_financial_management/domain/blocs/home_bloc/home_bloc.dart';
 import 'package:personal_financial_management/domain/blocs/page_route/page_route_bloc.dart';
+import 'package:personal_financial_management/domain/models/shared_item.dart';
+import 'package:personal_financial_management/domain/models/stepCard.dart';
 import 'package:personal_financial_management/domain/repositories/budget_repo.dart';
 import 'package:personal_financial_management/domain/repositories/repositories.dart';
 import 'package:personal_financial_management/domain/repositories/transaction_repo.dart';
 import 'package:personal_financial_management/domain/repositories/user_repo.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -31,8 +29,55 @@ class _HomeViewState extends State<HomeView> {
   late final TransactionRepository transactionRepository;
   late final BudgetRepository budgetRepository;
   late final WalletRepository walletRepository;
+  late final List<StepCard> stepItems = [
+    StepCard(
+        1,
+        "Đăng ký",
+        "Bạn cần hoàn thành một biểu mẫu đăng ký rất đơn giản, chứa tất cả thông tin liên hệ bắt buộc để nhập vào quá trình quyên góp.",
+        "https://blood-donation.nvquynh.codes/images/process_1.jpg"),
+    StepCard(
+        2,
+        "Xét nghiệm",
+        "Một giọt máu từ ngón tay của bạn sẽ được dùng làm xét nghiệm đơn giản để đảm bảo rằng lượng sắt trong máu của bạn đủ thích hợp cho quá trình hiến tặng.",
+        "https://blood-donation.nvquynh.codes/images/process_2.jpg"),
+    StepCard(
+        3,
+        "Hiến máu",
+        "Sau khi đảm bảo và vượt qua kiểm tra sàng lọc thành công, bạn sẽ được chuyển đến giường của người hiến tặng để hiến tặng. Quá trình này chỉ mất 6-10 phút.",
+        "https://blood-donation.nvquynh.codes/images/process_3.jpg"),
+    StepCard(
+        4,
+        "Nghỉ ngơi",
+        "Bạn cũng có thể ở trong phòng khách cho đến khi bạn cảm thấy đủ khỏe để rời khỏi trung tâm của chúng tôi. Bạn sẽ nhận được đồ uống tuyệt vời từ chúng tôi trong khu vực quyên góp.",
+        "https://blood-donation.nvquynh.codes/images/process_4.jpg"),
+  ];
+  late final List<SharedItem> sharedItems = [
+    SharedItem("Bạn có thể hiến máu ở đâu?", "https://google.com"),
+    SharedItem(
+        "Khuyến cáo phòng chống dịch bệnh COVID-19", "https://google.com"),
+    SharedItem("Hướng dẫn cài đặt và sử dụng ứng…", "https://google.com"),
+    SharedItem("Có thể bạn chưa biết về gói xét…", "https://google.com"),
+    SharedItem("Một số lưu ý trước và sau hiến…", "https://google.com"),
+    SharedItem("Thông báo tuyển sinh các khóa đào tạo…", "https://google.com"),
+    SharedItem("Các dịch vụ đào tạo đang triển khai", "https://google.com"),
+    SharedItem("Thủ tục khám bệnh và điều trị ngoại…", "https://google.com"),
+    SharedItem(
+        "Bệnh Thalassemia - hiểu biết, phòng tránh và…", "https://google.com"),
+    SharedItem(
+        "Tại sao phải xét nghiệm gen Thalassemia?", "https://google.com"),
+    SharedItem("Ai có thể bị Hemophilia và bệnh biểu…", "https://google.com"),
+    SharedItem("Hướng dẫn lưu giữ máu dây rốn dịch…", "https://google.com"),
+  ];
 
   DateTime? dateTime;
+
+  Future<void> _launchUrl(String url) async {
+    if (!await launchUrl(Uri.parse(url),
+        mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -68,18 +113,124 @@ class _HomeViewState extends State<HomeView> {
                 // );
               }
               return Scaffold(
-                body: Text('Hiến máu cứu người - Một nghĩa cử cao đẹp'),
-              );
+                  body: ListView(
+                children: [
+                  Column(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Quá trình hiến máu",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 30,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                      ...stepItems.map((e) {
+                        return _cardItem(
+                            e.id, e.name, e.description, e.imageUrl);
+                      }).toList(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Bạn cần biết",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 30,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      ...sharedItems.map((e) => _sharedItem(e.name, e.url)),
+                      const SizedBox(
+                        height: 10,
+                      )
+                    ],
+                  )
+                ],
+              ));
             },
           ),
         ));
   }
 
+  Widget _cardItem(int step, String name, String description, String imageurl) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 4,
+      margin: const EdgeInsets.all(19),
+      child: Column(
+        children: [
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(15),
+                  topRight: Radius.circular(15),
+                ),
+                child: Image.network(
+                  imageurl,
+                  width: double.infinity,
+                  height: 250,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned(
+                  bottom: 20,
+                  right: 5,
+                  child: Container(
+                    color: Colors.black54,
+                    width: 300,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                    child: Text(
+                      "Bước $step: $name",
+                      style: const TextStyle(fontSize: 26, color: Colors.white),
+                      softWrap: true,
+                      overflow: TextOverflow.fade,
+                    ),
+                  ))
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Text(description),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _sharedItem(String content, String link) {
+    return InkWell(
+      onTap: () => _launchUrl(link),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+        child: Row(children: [
+          const Icon(Icons.check_circle_rounded),
+          const SizedBox(
+            width: 5,
+          ),
+          Text(content)
+        ]),
+      ),
+    );
+  }
+
   // Widgets
   // TabBar
+  // ignore: unused_element
   Widget _buildTabBar() {
     late int _currentIndex = 0;
-    late TextStyle _tabBarTextStyle = TextStyle(
+    late TextStyle _tabBarTextStyle = const TextStyle(
       fontSize: 16,
     );
     late List<Widget> _tabs = [
@@ -120,20 +271,20 @@ class _HomeViewState extends State<HomeView> {
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(50),
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 boxShadow: <BoxShadow>[
                   BoxShadow(
                     color: MyAppColors.gray500,
                     blurRadius: 15.0,
-                    offset: const Offset(0.0, 0.75),
+                    offset: Offset(0.0, 0.75),
                   )
                 ],
                 color: MyAppColors.gray050,
               ),
               child: TabBar(
-                indicatorColor: Color.fromARGB(255, 218, 24, 24),
+                indicatorColor: const Color.fromARGB(255, 218, 24, 24),
                 unselectedLabelColor: MyAppColors.gray600,
-                labelColor: Color.fromARGB(255, 218, 24, 24),
+                labelColor: const Color.fromARGB(255, 218, 24, 24),
                 onTap: _onChangeTab,
                 tabs: _tabs,
               ),
@@ -267,7 +418,7 @@ class _HomeViewState extends State<HomeView> {
                 'Hạn mức: ${numberFormat.format(totalBudget)} ${numberFormat.currencyName}',
                 maxLines: 1,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: MyAppColors.gray600,
@@ -293,7 +444,7 @@ class _HomeViewState extends State<HomeView> {
           BoxShadow(
             color: MyAppColors.gray500,
             blurRadius: 0,
-            offset: const Offset(0.0, 0.75),
+            offset: Offset(0.0, 0.75),
           )
         ],
         color: MyAppColors.white000,
@@ -303,7 +454,7 @@ class _HomeViewState extends State<HomeView> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(leftTitle, style: TextStyle(fontSize: 14)),
+            Text(leftTitle, style: const TextStyle(fontSize: 14)),
             BlocProvider(
               create: (context) => PageRouteBloc(),
               child: BlocBuilder<PageRouteBloc, PageRouteState>(
